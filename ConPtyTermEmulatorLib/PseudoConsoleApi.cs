@@ -7,15 +7,15 @@ namespace ConPtyTermEmulatorLib {
 	/// <summary>
 	/// PInvoke signatures for Win32's PseudoConsole API.
 	/// </summary>
-	static class PseudoConsoleApi {
+	public static class PseudoConsoleApi {
 
 		[DllImport("conpty.dll", SetLastError = true)]
-		internal static extern int CreatePseudoConsole(COORD size, SafeFileHandle hInput, SafeFileHandle hOutput, uint dwFlags, out IntPtr phPC);
+		internal  static extern int CreatePseudoConsole(COORD size, SafeFileHandle hInput, SafeFileHandle hOutput, uint dwFlags, out IntPtr phPC);
 
 		[DllImport("conpty.dll", SetLastError = true)]
-		internal static extern int ClosePseudoConsole(IntPtr hPC);
+		internal  static extern int ClosePseudoConsole(IntPtr hPC);
 		[DllImport("conpty.dll", SetLastError = true)]
-		internal static extern int ResizePseudoConsole(IntPtr hPC, COORD size);
+		internal  static extern int ResizePseudoConsole(IntPtr hPC, COORD size);
 
 
 

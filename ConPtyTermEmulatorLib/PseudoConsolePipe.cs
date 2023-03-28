@@ -12,7 +12,7 @@ namespace ConPtyTermEmulatorLib {
 	/// <remarks>
 	/// We'll have two instances of this class, one for input and one for output.
 	/// </remarks>
-	internal sealed class PseudoConsolePipe : IDisposable {
+	public class PseudoConsolePipe : IDisposable {
 		public readonly SafeFileHandle ReadSide;
 		public readonly SafeFileHandle WriteSide;
 
