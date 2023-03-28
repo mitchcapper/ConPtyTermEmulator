@@ -15,7 +15,11 @@ namespace ConPtyTermEmulatorLib {
 	public class BasicTerminalControl : UserControl {
 		public BasicTerminalControl() {
 			InitializeComponent();
+			SetKBCaptureOptions();
 		}
+		[Flags]
+		[System.ComponentModel.TypeConverter(typeof(System.ComponentModel.EnumConverter))]
+		public enum INPUT_CAPTURE { None = 1 << 0, TabKey = 1 << 1, DirectionKeys = 1 << 2 };
 
 		public TerminalTheme? Theme { set; get; }
 		public static readonly DependencyProperty ThemeProperty = DependencyProperty.Register(nameof(Theme), typeof(TerminalTheme?), typeof(BasicTerminalControl), new FrameworkPropertyMetadata(null, CoerceTheme));
@@ -23,6 +27,20 @@ namespace ConPtyTermEmulatorLib {
 		private static object CoerceTheme(DependencyObject target, object value) {
 			(target as BasicTerminalControl).Theme = value as TerminalTheme?;
 			return default;
+		private static void InputCaptureChanged(DependencyObject target, DependencyPropertyChangedEventArgs e) {
+			var cntrl = target as BasicTerminalControl;
+			cntrl.SetKBCaptureOptions();
+		}
+		private void SetKBCaptureOptions() {
+			KeyboardNavigation.SetTabNavigation(this, InputCapture.HasFlag(INPUT_CAPTURE.TabKey) ? KeyboardNavigationMode.Contained : KeyboardNavigationMode.Continue);
+			KeyboardNavigation.SetDirectionalNavigation(this, InputCapture.HasFlag(INPUT_CAPTURE.DirectionKeys) ? KeyboardNavigationMode.Contained : KeyboardNavigationMode.Continue);
+		}
+		/// <summary>
+		/// Helper property for setting KeyboardNavigation.Set*Navigation commands to prevent arrow keys or tabs from causing us to leave the control (aka pass through to conpty)
+		/// </summary>
+		public INPUT_CAPTURE InputCapture {
+			get => (INPUT_CAPTURE)GetValue(InputCaptureProperty);
+			set => SetValue(InputCaptureProperty, value);
 		}
 		protected static readonly DependencyPropertyKey TerminalPropertyKey =
 		 DependencyProperty.RegisterReadOnly(nameof(Terminal), typeof(TerminalControl), typeof(BasicTerminalControl),new PropertyMetadata());
@@ -110,5 +128,7 @@ namespace ConPtyTermEmulatorLib {
 				Terminal.SetTheme(Theme.Value, FontFamilyWhenSettingTheme.Source, (short)FontSizeWhenSettingTheme);
 			Terminal.Focus();
 		}
+		public static readonly DependencyProperty InputCaptureProperty = DependencyProperty.Register(nameof(InputCapture), typeof(INPUT_CAPTURE), typeof(BasicTerminalControl), new
+		PropertyMetadata(INPUT_CAPTURE.TabKey | INPUT_CAPTURE.DirectionKeys, InputCaptureChanged));
 	}
 }
