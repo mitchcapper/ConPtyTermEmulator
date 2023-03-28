@@ -26,7 +26,7 @@ namespace TermExample {
 		}
 		public class DataBinds {
 			public string StartupCommand => "pwsh.exe";
-			private static uint ColorToVal(Color color) => BitConverter.ToUInt32(new byte[] { color.G, color.R, color.B, color.A }, 0);
+			private static uint ColorToVal(Color color) => BitConverter.ToUInt32(new byte[] { color.R, color.G, color.B, color.A }, 0);
 			private static readonly Color BackroundColor = Colors.DarkBlue;
 			public SolidColorBrush BackroundColorBrush => new(BackroundColor);
 			public TerminalTheme Theme { get; set; } = new() {

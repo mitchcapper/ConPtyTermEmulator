@@ -1,34 +1,47 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	<TargetFrameworks>net6.0-windows</TargetFrameworks>
-    <PlatformTarget>x64</PlatformTarget>
-    <Platforms>x64</Platforms>
-	<UseWpf>true</UseWpf>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0-windows10.0.19041</TargetFramework>
+		<PlatformTarget>x64</PlatformTarget>
+		<RuntimeIdentifiers>win10-arm64</RuntimeIdentifiers>
+		<Platforms>x64</Platforms>
+		<UseWpf>true</UseWpf>
+		<Version>1.0.13</Version>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="NativeMethods.txt" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="NativeMethods.txt" />
+	</ItemGroup>
 
-  
-  <ItemGroup>
-    <None Include="PublicTerminalCore.dll" Link="PublicTerminalCore.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Windows.Console.ConPTY" Version="0.0.5" />
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.206-beta">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<!--<PackageReference Include="Teronis.MSBuild.Packaging.ProjectBuildInPackage" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>-->
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.Console.ConPTY" Version="0.0.5" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.206-beta">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Microsoft.Terminal.Wpf">
-      <HintPath>Microsoft.Terminal.Wpf.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="runtimes\win10-x64\native\*" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="runtimes\win10-x64\native" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<None Include="lib\Microsoft.Terminal.Wpf.dll" Pack="true"  PackagePath="lib\$(TargetFramework)" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<Reference Include="Microsoft.Terminal.Wpf">
+			<PrivateAssets>all</PrivateAssets>
+			<HintPath>lib\net6.0-windows10.0.19041.0\Microsoft.Terminal.Wpf.dll</HintPath>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Reference>
+	</ItemGroup>
+
 
 </Project>

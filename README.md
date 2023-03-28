@@ -27,8 +27,8 @@ Make sure your output looks like:
 
 To accomplish this I did change the nuget package structure to still be able to use a package.
 
-You will need PublicTerminalCore.dll and Microsoft.Terminal.Wpf.dll from the Terminal build as well.
+You will need `PublicTerminalCore.dll` and `Microsoft.Terminal.Wpf.dll` from the Terminal build as well.  Place them in `ConPtyTermEmulatorLib/lib` and `ConPtyTermEmulatorLib/runtimes/win10-x64/native` respectively.
 
-You do not need to create a nuget package but can just manually copy all the dlls/execs to the write location if desired.
+You do not need to create a nuget package but can just manually copy all the dlls/exes to the final build location paths above if desired.
 
 There are airspace issues (you cannot put anything above the terminal control).  I could not get the ConPTY term to be in win32-input-mode.  From what I read setting `PSEUDOCONSOLE_WIN32_INPUT_MODE` for the flags in `CreatePseudoConsole` should work but powershell would crash.

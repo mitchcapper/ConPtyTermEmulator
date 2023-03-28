@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.22621.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <Platforms>x64</Platforms>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,8 +14,9 @@
 
   <ItemGroup>
     <Reference Include="Microsoft.Terminal.Wpf">
-      <HintPath>Microsoft.Terminal.Wpf.dll</HintPath>
+      <HintPath>..\ConPtyTermEmulatorLib\lib\Microsoft.Terminal.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
+
 
 </Project>
