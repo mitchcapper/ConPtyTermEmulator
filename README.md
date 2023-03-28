@@ -1,8 +1,18 @@
-## Simple example library/control/test app for the Windows Terminal WPF Control and the new ConPTY Library.
+# WPF Terminal Console Control Lib/Sample
+
+Simple example library/control/test app for the Windows Terminal WPF Control and the new ConPTY Library.
 
 ![](TermExample/Screenshot.png)
 
-Note if you give an invalid executable for the shell start or if your OpenConsole.exe is not in the right place you will get a crash on start.
+## Usage
+
+Using the control is as simple as adding the control to your xaml ie:
+
+`<term:BasicTerminalControl StartupCommandLine="pwsh.exe" />`
+
+there are other options you can customize but that will get you a fully working terminal with mouse/keyboard support including ANSI formatting.
+
+## Building This Library/Demo
 
 Make sure your output looks like:
 
@@ -31,4 +41,12 @@ You will need `PublicTerminalCore.dll` and `Microsoft.Terminal.Wpf.dll` from the
 
 You do not need to create a nuget package but can just manually copy all the dlls/exes to the final build location paths above if desired.
 
-There are airspace issues (you cannot put anything above the terminal control).  I could not get the ConPTY term to be in win32-input-mode.  From what I read setting `PSEUDOCONSOLE_WIN32_INPUT_MODE` for the flags in `CreatePseudoConsole` should work but powershell would crash.
+
+
+## Notes/Issues/Troubleshooting
+
+- This control should not be used for any production situations as they are not meant for release yet: [Productize the WPF, UWP Terminal Controls · Issue #6999 · microsoft/terminal · GitHub](https://github.com/microsoft/terminal/issues/6999)
+
+- There are airspace issues (you cannot put anything above the terminal control)
+
+- If you give an invalid executable for the shell start or if your OpenConsole.exe is not in the right place you will get a crash on start
