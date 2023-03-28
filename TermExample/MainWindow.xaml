@@ -7,7 +7,8 @@
 		mc:Ignorable="d" Background="{Binding BackroundColorBrush}"
         Title="Sample Term" Height="550" Width="1200">
     <Grid>
-		<term:BasicTerminalControl x:Name="basicTermControl" KeyboardNavigation.TabNavigation="Contained" Theme="{Binding Theme}" StartupCommandLine="{Binding StartupCommand}" FontFamilyWhenSettingTheme="Consolas" LogConPTYOutput="True" Margin="0,0,0,30" >
+
+		<term:BasicTerminalControl x:Name="basicTermControl" Theme="{Binding Theme}" StartupCommandLine="{Binding StartupCommand}" FontFamilyWhenSettingTheme="Consolas" LogConPTYOutput="True" Margin="0,0,0,30" Win32InputMode="True" InputCapture="TabKey,DirectionKeys" >
 			<term:BasicTerminalControl.Resources>
 				<Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
 					<!--Lazy Theming-->
@@ -15,7 +16,9 @@
 				</Style>
 			</term:BasicTerminalControl.Resources>
 		</term:BasicTerminalControl>
-		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" >
+		
+		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom"  >
+			<Button Content="Duplicate New" Click="DuplicateClicked" Margin="5" />
 			<Button Content="Clear Term" Click="ClearBufferClicked" Margin="5" />
 			<Button Content="Show Buffer" Click="ShowBufferClicked" Margin="5" />
 		</StackPanel>

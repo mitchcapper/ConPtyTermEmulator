@@ -22,9 +22,16 @@ namespace TermExample {
 	public partial class MainWindow : Window {
 		public MainWindow() {
 			DataContext = new DataBinds();
-			InitializeComponent();
+			InitializeComponent();			
 		}
-		public class DataBinds {
+		public MainWindow(ConPtyTermEmulatorLib.Term existingTerm) {
+			DataContext = new DataBinds();
+			InitializeComponent();
+			//basicTermControl.DisconnectConPTYTerm();//This should be used but only after the TerminalContainer patch is applied
+			basicTermControl.ConPTYTerm = existingTerm;
+		}
+
+        public class DataBinds {
 			public string StartupCommand => "pwsh.exe";
 			private static uint ColorToVal(Color color) => BitConverter.ToUInt32(new byte[] { color.R, color.G, color.B, color.A }, 0);
 			private static readonly Color BackroundColor = Colors.DarkBlue;
@@ -56,6 +63,23 @@ namespace TermExample {
 			basicTermControl.ConPTYTerm.ConsoleOutputLog.Clear();
 			RefocusKB();
 
+		}
+
+		private bool MirrorMode = true;
+		private void DuplicateClicked(object sender, RoutedEventArgs e) {
+			// Don't really recommend doing this basic cloning we will sync our size at least so the positionings are correct.
+			var wind = new MainWindow(basicTermControl.ConPTYTerm);
+			if (MirrorMode)
+				wind.SizeChanged += Wind_SizeChanged;
+			else
+				basicTermControl.DisconnectConPTYTerm();
+			wind.Show();
+		}
+
+		private void Wind_SizeChanged(object sender, SizeChangedEventArgs e) {
+			var wind = sender as MainWindow;
+			Width = wind.Width;
+			Height = wind.Height;
 		}
 	}
 }
