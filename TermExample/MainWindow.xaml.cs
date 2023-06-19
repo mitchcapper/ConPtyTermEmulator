@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -13,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ConPtyTermEmulatorLib;
 using Microsoft.Terminal.Wpf;
 
 namespace TermExample {
@@ -22,20 +25,34 @@ namespace TermExample {
 	public partial class MainWindow : Window {
 		public MainWindow() {
 			DataContext = new DataBinds();
+			Loaded += MainWindow_Loaded;
 			InitializeComponent();			
 		}
+
+		private async void MainWindow_Loaded(object sender, RoutedEventArgs e) {
+		
+			
+		}
+
 		public MainWindow(ConPtyTermEmulatorLib.Term existingTerm) {
+			Loaded += MainWindow_Loaded;
 			DataContext = new DataBinds();
 			InitializeComponent();
-			//basicTermControl.DisconnectConPTYTerm();//This should be used but only after the TerminalContainer patch is applied
+			basicTermControl.DisconnectConPTYTerm();//This should be used but only after the TerminalContainer patch is applied
 			basicTermControl.ConPTYTerm = existingTerm;
 		}
 
-        public class DataBinds {
+        public class DataBinds : INotifyPropertyChanged {
+			public void TriggerPropChanged(string prop) => PropertyChanged?.Invoke(this,new PropertyChangedEventArgs(prop));
+			
 			public string StartupCommand => "pwsh.exe";
 			private static uint ColorToVal(Color color) => BitConverter.ToUInt32(new byte[] { color.R, color.G, color.B, color.A }, 0);
 			private static readonly Color BackroundColor = Colors.DarkBlue;
+
+			public event PropertyChangedEventHandler PropertyChanged;
+
 			public SolidColorBrush BackroundColorBrush => new(BackroundColor);
+			//private TerminalTheme _Theme;
 			public TerminalTheme Theme { get; set; } = new() {
 				DefaultBackground = ColorToVal(BackroundColor),
 				DefaultForeground = ColorToVal(Colors.LightYellow),
@@ -59,13 +76,12 @@ namespace TermExample {
 		}
 
 		private void ClearBufferClicked(object sender, RoutedEventArgs e) {
-			basicTermControl.ConPTYTerm.WriteToTerm("clear\r");
 			basicTermControl.ConPTYTerm.ConsoleOutputLog.Clear();
 			RefocusKB();
 
 		}
 
-		private bool MirrorMode = true;
+		private bool MirrorMode = false;
 		private void DuplicateClicked(object sender, RoutedEventArgs e) {
 			// Don't really recommend doing this basic cloning we will sync our size at least so the positionings are correct.
 			var wind = new MainWindow(basicTermControl.ConPTYTerm);
@@ -80,6 +96,11 @@ namespace TermExample {
 			var wind = sender as MainWindow;
 			Width = wind.Width;
 			Height = wind.Height;
+		}
+
+		private void ShowProcessOutputClicked(object sender, RoutedEventArgs e) {
+			var wind = new ProcessOutput();
+			wind.Show();
 		}
 	}
 }

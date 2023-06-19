@@ -6,9 +6,8 @@
         xmlns:local="clr-namespace:TermExample" xmlns:term="clr-namespace:ConPtyTermEmulatorLib;assembly=ConPtyTermEmulatorLib"
 		mc:Ignorable="d" Background="{Binding BackroundColorBrush}"
         Title="Sample Term" Height="550" Width="1200">
-    <Grid>
-
-		<term:BasicTerminalControl x:Name="basicTermControl" Theme="{Binding Theme}" StartupCommandLine="{Binding StartupCommand}" FontFamilyWhenSettingTheme="Consolas" LogConPTYOutput="True" Margin="0,0,0,30" Win32InputMode="True" InputCapture="TabKey,DirectionKeys" >
+	<Grid>
+		<term:BasicTerminalControl x:Name="basicTermControl" StartupCommandLine="{Binding StartupCommand}" Theme="{Binding Theme, Mode=OneWay}" FontFamilyWhenSettingTheme="Consolas" LogConPTYOutput="True" Margin="0,0,0,30" Win32InputMode="True" InputCapture="TabKey,DirectionKeys" >
 			<term:BasicTerminalControl.Resources>
 				<Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
 					<!--Lazy Theming-->
@@ -21,6 +20,7 @@
 			<Button Content="Duplicate New" Click="DuplicateClicked" Margin="5" />
 			<Button Content="Clear Term" Click="ClearBufferClicked" Margin="5" />
 			<Button Content="Show Buffer" Click="ShowBufferClicked" Margin="5" />
+			<!--<Button Content="Process Output Sample" Click="ShowProcessOutputClicked" Margin="5" />-->
 		</StackPanel>
 	</Grid>
 </Window>
