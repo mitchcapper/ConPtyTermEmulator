@@ -1,4 +1,8 @@
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,7 +37,23 @@ namespace ConPtyTermEmulatorLib {
 			get => (INPUT_CAPTURE)GetValue(InputCaptureProperty);
 			set => SetValue(InputCaptureProperty, value);
 		}
-		public TerminalTheme? Theme { set; get; }
+
+		[Description("Write only, sets the terminal theme"), Category("Common")]
+		public TerminalTheme? Theme { set => SetTheme(_Theme = value); private get => _Theme; }
+		private TerminalTheme? _Theme;
+		private void SetTheme(TerminalTheme? v) {if(v != null) Terminal?.SetTheme(v.Value, FontFamilyWhenSettingTheme.Source, (short) FontSizeWhenSettingTheme); }
+		
+
+
+		[Description("Write only, When true user cannot give input through the Terminal UI (can still write to the Term from code behind using Term.WriteToTerm)"), Category("Common")]
+		public bool? IsReadOnly { set => SetReadOnly(_IsReadOnly = value); private get => _IsReadOnly; }
+		private bool? _IsReadOnly;
+		private void SetReadOnly(bool? v) { if (v != null) ConPTYTerm?.SetReadOnly(v.Value,false); }//no cursor auto update if user wants that they can use the separate dependency property for the cursor visibility
+
+		[Description("Write only, if the type cursor shows on the Terminal UI"), Category("Common")]
+		public bool? IsCursorVisible { set => SetCursor(_IsCursorVisible = value); private get => _IsCursorVisible;}
+		private bool? _IsCursorVisible;
+		private void SetCursor(bool? v) { if (v != null) ConPTYTerm?.SetCursorVisibility(v.Value); }
 
 
 		public TerminalControl Terminal {
@@ -91,8 +111,6 @@ namespace ConPtyTermEmulatorLib {
 			set => SetValue(Win32InputModeProperty, value);
 		}
 
-
-
 		public FontFamily FontFamilyWhenSettingTheme {
 			get => (FontFamily)GetValue(FontFamilyWhenSettingThemeProperty);
 			set => SetValue(FontFamilyWhenSettingThemeProperty, value);
@@ -140,21 +158,22 @@ namespace ConPtyTermEmulatorLib {
 				Task.Run(() => term.Start(cmd, column_width, row_height, logOutput));
 			});
 		}
-		private void Terminal_Loaded(object sender, RoutedEventArgs e) {
+		private async void Terminal_Loaded(object sender, RoutedEventArgs e) {
 			StartTerm(Terminal.Columns, Terminal.Rows);
-			if (Theme != null)
-				Terminal.SetTheme(Theme.Value, FontFamilyWhenSettingTheme.Source, (short)FontSizeWhenSettingTheme);
+			SetTheme(Theme);
+			SetCursor(IsCursorVisible);
+			SetReadOnly(IsReadOnly);
 			Terminal.Focus();
+			await Task.Delay(1000);
+			SetCursor(IsCursorVisible);
 		}
 
 		#region Depdendency Properties
 		public static readonly DependencyProperty InputCaptureProperty = DependencyProperty.Register(nameof(InputCapture), typeof(INPUT_CAPTURE), typeof(BasicTerminalControl), new
 		PropertyMetadata(INPUT_CAPTURE.TabKey | INPUT_CAPTURE.DirectionKeys, InputCaptureChanged));
-		public static readonly DependencyProperty ThemeProperty = DependencyProperty.Register(nameof(Theme), typeof(TerminalTheme?), typeof(BasicTerminalControl), new FrameworkPropertyMetadata(null, CoerceTheme));
-		private static object CoerceTheme(DependencyObject target, object value) {//prevent users from thinking they can read the theme
-			(target as BasicTerminalControl).Theme = value as TerminalTheme?;
-			return default;
-		}
+
+		public static readonly DependencyProperty ThemeProperty = PropHelper.GenerateWriteOnlyProperty((c) => c.Theme);
+
 		protected static readonly DependencyPropertyKey TerminalPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Terminal), typeof(TerminalControl), typeof(BasicTerminalControl), new PropertyMetadata());
 
 		public static readonly DependencyProperty TerminalProperty = TerminalPropertyKey.DependencyProperty;
@@ -163,11 +182,34 @@ namespace ConPtyTermEmulatorLib {
 
 		public static readonly DependencyProperty LogConPTYOutputProperty = DependencyProperty.Register(nameof(LogConPTYOutput), typeof(bool), typeof(BasicTerminalControl), new PropertyMetadata(false));
 		public static readonly DependencyProperty Win32InputModeProperty = DependencyProperty.Register(nameof(Win32InputMode), typeof(bool), typeof(BasicTerminalControl), new PropertyMetadata(true));
-		
+		public static readonly DependencyProperty IsReadOnlyProperty = PropHelper.GenerateWriteOnlyProperty((c) => c.IsReadOnly);
+		public static readonly DependencyProperty IsCursorVisibleProperty = PropHelper.GenerateWriteOnlyProperty((c) => c.IsCursorVisible);
 
 		public static readonly DependencyProperty FontFamilyWhenSettingThemeProperty = DependencyProperty.Register(nameof(FontFamilyWhenSettingTheme), typeof(FontFamily), typeof(BasicTerminalControl), new PropertyMetadata(new FontFamily("Cascadia Code")));
 
 		public static readonly DependencyProperty FontSizeWhenSettingThemeProperty = DependencyProperty.Register(nameof(FontSizeWhenSettingTheme), typeof(int), typeof(BasicTerminalControl), new PropertyMetadata(12));
+
+		private class PropHelper : DepPropHelper<BasicTerminalControl> { }
+		private class DepPropHelper<CONTROL_TYPE> where CONTROL_TYPE : UserControl {
+			protected DepPropHelper() => throw new Exception("Should not be instanced");
+			public static DependencyProperty GenerateWriteOnlyProperty<PROP_TYPE>(Expression<Func<CONTROL_TYPE, PROP_TYPE>> PropToSet) {
+
+				var me = PropToSet.Body as MemberExpression;
+				if (me == null)
+					throw new ArgumentException(nameof(PropToSet));
+				var propName = me.Member.Name;
+				var prop = typeof(CONTROL_TYPE).GetProperty(me.Member.Name, BindingFlags.Instance | BindingFlags.Public);
+
+				if (prop == null)
+					throw new ArgumentException(nameof(PropToSet));
+
+				return DependencyProperty.Register(propName, typeof(PROP_TYPE), typeof(CONTROL_TYPE), new FrameworkPropertyMetadata(null, (target, value) => CoerceReadOnlyHandle(prop.SetMethod, target, value)));
+			}
+			private static object CoerceReadOnlyHandle(MethodInfo SetMethod, DependencyObject target, object value) {
+				SetMethod.Invoke(target, new object[] { value });
+				return null;
+			}
+		}
 
 		#endregion
 	}
