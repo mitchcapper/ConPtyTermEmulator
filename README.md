@@ -22,24 +22,18 @@ Make sure your output looks like:
 ./Microsoft.Terminal.Wpf.dll
 ./Microsoft.Terminal.Wpf.pdb
 ./Microsoft.Terminal.Wpf.xml
-./PublicTerminalCore.dll
-./runtimes
-./runtimes/win10-x64
-./runtimes/win10-x64/native
-./runtimes/win10-x64/native/conpty.dll
-./runtimes/win10-x64/native/OpenConsole.exe
+./runtimes/win-x64/native/conpty.dll
+./runtimes/win-x64/native/PublicTerminalCore.dll
+./runtimes/win-x64/native/OpenConsole.exe
 ./TermExample.deps.json
 ./TermExample.dll
 ./TermExample.exe
-./TermExample.pdb
 ./TermExample.runtimeconfig.json
 ```
 
-To accomplish this I did change the nuget package structure to still be able to use a package.
+Microsoft now has a CI nuget package for Microsoft.Terminal.Wpf so the EmulatorLib will pull that in by default.  For ConPTY (including OpenConsole.exe) there is no package built automatically yet.  To avoid having to build it locally yourself you can download one of the latest drop artifacts from the azure CI runs.  Go to: https://dev.azure.com/ms/terminal/_build?definitionId=136 click on one of the successful runs under the stages for the "Build x64" it should say X jobs completed and under that show a link to the artifacts ("ie 3 artifacts").  Download the "drop" artifact and copy the files from drop\Release\x64\test\ of: ConPty.dll and OpenConsole.dll to ConPtyTermEmulatorLib/runtimes/win-x64/native.
 
-You will need `PublicTerminalCore.dll` and `Microsoft.Terminal.Wpf.dll` from the Terminal build as well.  Place them in `ConPtyTermEmulatorLib/lib` and `ConPtyTermEmulatorLib/runtimes/win10-x64/native` respectively.
-
-You do not need to create a nuget package but can just manually copy all the dlls/exes to the final build location paths above if desired.
+Adding the dlls direct to the ConPtyTermEmulatorLib means it will produce a complete nuget package with no manual work for any projects you include it in. Any project you use it in should end up with the right files in the places above.
 
 
 

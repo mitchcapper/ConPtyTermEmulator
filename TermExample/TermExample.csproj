@@ -12,11 +12,5 @@
     <ProjectReference Include="..\ConPtyTermEmulatorLib\ConPtyTermEmulatorLib.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Microsoft.Terminal.Wpf">
-      <HintPath>..\ConPtyTermEmulatorLib\lib\Microsoft.Terminal.Wpf.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 
 </Project>
